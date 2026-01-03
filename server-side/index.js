@@ -15,16 +15,12 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    
-    console.log('Blocked origin:', origin);
-    return callback(new Error('Not allowed by CORS'));
-  },
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://task-manager-nine-blue-18.vercel.app',
+    'https://claude.ai'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -35,6 +31,7 @@ dotenv.config()
 const taskRoutes = require('./view/task.view')
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 
 
 
