@@ -80,9 +80,44 @@ const updateTask = async (req, res) => {
             data: updatedTask
         })
     } catch (error) {
-        success: false,
+        
         console.error('Error updating task:', error)
-        res.status(500).json({ message: 'Internal server error' })
+        res.status(500).json({ 
+            success: false,
+            message: 'Internal server error' })
+    }
+}
+
+const updateStatus = async (req, res) => {
+    try {
+        const {status} = req.body
+        if (!status || !['Pending', 'Completed'].includes(status)) {
+            return res.status(400).json({ message: 'Invalid status value i.e Pending or Completed required' })
+        }
+
+        const updatedTask = await Task.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true, runValidators: true }
+        )
+
+        if (!updatedTask) {
+            return res.status(404).json({
+                success: false,
+                 message: 'Task not found' })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Task status updated successfully',
+            data: updatedTask
+        })
+    } catch (error) {
+        
+        console.error('Error updating task status:', error)
+        res.status(500).json({ 
+            success: false,
+            message: 'Internal server error' })
     }
 }
 
@@ -105,9 +140,39 @@ const deleteTask = async (req, res) => {
     }
 }
 
+const taskSummary = async (req, res) => {
+    try {
+        const totalTasks = await Task.countDocuments()
+        const pendingTasks = await Task.countDocuments({status: 'Pending'})
+        const completedTasks = await Task.countDocuments({status: 'Completed'})
+        const highPriorityTasks = await Task.countDocuments({priority: 'High', status: 'Pending'})
+
+        res.status(200).json({
+            success: true,
+            message: 'Task summary retrieved successfully',
+            data: {
+                total: totalTasks,
+                pending: pendingTasks,
+                completed: completedTasks,
+                highPriority: highPriorityTasks
+            }
+        })
+    } catch (error) {
+        console.error('Error getting task summary:', error)
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        error: error.message
+        })
+    }
+}
+
+
 module.exports = {
     createTask,
     getTasks,
     updateTask,
-    deleteTask
+    updateStatus,
+    deleteTask,
+    taskSummary
 }

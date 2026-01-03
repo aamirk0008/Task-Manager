@@ -21,6 +21,7 @@ const TaskTracker = () => {
   // Fetch all tasks on component mount
   useEffect(() => {
     fetchTasks();
+    fetchStats();
   }, []);
 
   // API Functions
@@ -46,6 +47,18 @@ const TaskTracker = () => {
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      const response = await fetch(`${API_URL}/taskSummary`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setStats(data.data);
+      }
+    } catch (err) {
+      console.error('Stats fetch error:', err);
+    }
+  };
 
   const createTask = async (taskData) => {
     try {
@@ -58,6 +71,7 @@ const TaskTracker = () => {
       
       if (data.success) {
         await fetchTasks();
+        await fetchStats();
         return { success: true };
       } else {
         return { success: false, message: data.message };
@@ -79,6 +93,7 @@ const TaskTracker = () => {
       
       if (data.success) {
         await fetchTasks();
+        await fetchStats();
         return { success: true };
       } else {
         return { success: false, message: data.message };
@@ -97,7 +112,8 @@ const TaskTracker = () => {
       const data = await response.json();
       
       if (data.success) {
-        await fetchTasks()
+        await fetchTasks();
+        await fetchStats();
         return { success: true };
       } else {
         return { success: false, message: data.message };
@@ -108,6 +124,29 @@ const TaskTracker = () => {
     }
   };
 
+  const toggleTaskStatus = async (task) => {
+    const newStatus = task.status === 'Pending' ? 'Completed' : 'Pending';
+    try {
+      const response = await fetch(`${API_URL}/updateStatus/${task._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        await fetchTasks();
+        await fetchStats();
+      }
+    } catch (err) {
+      console.error('Toggle status error:', err);
+    }
+  };
+
+  //sort by due date
+  function sortByDueDate(tasks) {
+    return tasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+  }
 
   // Form Handlers
   const handleInputChange = (e) => {
@@ -376,6 +415,7 @@ const TaskTracker = () => {
         {!loading && (
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Pending Tasks</h2>
+            <button onClick={sortByDueDate}>Sort By DueDate</button>
             {pendingTasks.length === 0 ? (
               <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
                 No pending tasks. Great job! 🎉
@@ -388,7 +428,7 @@ const TaskTracker = () => {
                     task={task}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    // onToggleStatus={toggleTaskStatus}
+                    onToggleStatus={toggleTaskStatus}
                     getPriorityColor={getPriorityColor}
                     formatDate={formatDate}
                     loading={loading}
