@@ -40,10 +40,12 @@ const getTasks = async (req, res) => {
         const sortOptions  = {[sortBy]: sortOrder}
         const tasks = await Task.find(filter).sort(sortOptions)
         res.status(200).json({
+            success: true,
             message: 'Tasks retrieved successfully',
             data: tasks
         })
     } catch (error) {
+        success: false,
         console.error('Error getting tasks:', error)
         res.status(500).json({ message: 'Internal server error' })
     }
@@ -73,10 +75,12 @@ const updateTask = async (req, res) => {
         }
 
         res.status(200).json({
+            success: true,
             message: 'Task updated successfully',
             data: updatedTask
         })
     } catch (error) {
+        success: false,
         console.error('Error updating task:', error)
         res.status(500).json({ message: 'Internal server error' })
     }
@@ -90,10 +94,12 @@ const deleteTask = async (req, res) => {
             return res.status(404).json({ message: 'Task not found' })
         }
         res.status(200).json({
+            success: true,
             message: 'Task deleted successfully',
             data: deletedTask
         })
     } catch (error) {
+        success: false,
         console.error('Error deleting task:', error)
         res.status(500).json({ message: 'Internal server error' })
     }
