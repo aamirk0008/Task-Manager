@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Edit2, Plus, X, Check, AlertCircle, Loader } from 'lucide-react';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://task-manager-n4hh.onrender.com/api';
 
 const TaskTracker = () => {
   const [tasks, setTasks] = useState([]);
