@@ -45,9 +45,11 @@ const getTasks = async (req, res) => {
             data: tasks
         })
     } catch (error) {
-        success: false,
+        
         console.error('Error getting tasks:', error)
-        res.status(500).json({ message: 'Internal server error' })
+        res.status(500).json({ 
+            success: false,
+            message: 'Internal server error' })
     }
 }
 
@@ -134,9 +136,11 @@ const deleteTask = async (req, res) => {
             data: deletedTask
         })
     } catch (error) {
-        success: false,
+        
         console.error('Error deleting task:', error)
-        res.status(500).json({ message: 'Internal server error' })
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error' })
     }
 }
 
